@@ -2,53 +2,63 @@ package org.nicolau.biddingscrapinggov.service;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.nicolau.biddingscrapinggov.model.Bidding;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ScrapingService {
 
-    public void  runScraping() throws IOException {
-        Document doc = Jsoup.connect("http://comprasnet.gov.br/ConsultaLicitacoes/ConsLicitacaoDia.asp").get();
-        Elements links = doc.select("a");
+    private static final int NUMBER_OF_RECORDS_PAGE = 20;
+    private static final String URL = "http://comprasnet.gov.br/ConsultaLicitacoes/ConsLicitacaoDia.asp";
+
+    public  void  runScraping() throws Exception {
+        Document doc = Jsoup.connect(URL).get();
+        String recordTotalText = doc.select("html > body > table.tex3 > tbody > tr").get(1).select("> td.td > center").text();
+        //Pega o valor total de Licitações
+        Integer recordTotalQuantity = loadTotalRecord(recordTotalText);
+        int numberTotalOfPages = ( recordTotalQuantity / NUMBER_OF_RECORDS_PAGE ) + 1;
+
+        for (int index = 1; index < numberTotalOfPages ; index++){
+            String title = doc.title();
+            //Pega todos as Licitações
+            Elements bidding = doc.select("html > body > table.tex3 > tbody > tr").get(0).select("> td > form");
+
+            bidding.forEach(bid -> {
+                Bidding newBidding =  new Bidding();
+                Elements record = bid.select("> table > tbody > tr.tex3 > td");
+                loadInstitutionAndUASGCode(record, newBidding);
+                loadModalityAndNumber(record, newBidding);
+            });
+
+            doc = Jsoup.connect(URL + "?pagina=" + index).get();
+
+        }
 
     }
 
-    public static void main(String[] args) throws Exception {
-        Document doc = Jsoup.connect("http://comprasnet.gov.br/ConsultaLicitacoes/ConsLicitacaoDia.asp").get();
-        String title = doc.title();
-        //cria um loop que armazena os intens do seletor xpath//html/body/table[4]/tbody/tr[1]/td/form[1]/table/tbody
-        Elements aux10 = doc.select("html > body > table.tex3 > form");
+    private void loadInstitutionAndUASGCode(Elements record, Bidding bidding){
+        List<String> values =  Arrays.stream(record.select("> b").get(0).text().split("Código da UASG:")).toList();
+        bidding.setInstitution(values.get(0).trim());
+        bidding.setUASGCode(values.get(1).trim());
+    }
 
-        for (int i = 1; i < 10; i++) {
-            Element td = aux10
-                    .get(i)
-                    .select("tr.tex3")
-                    .select("td")
-                    .select("td")
-                    .first();
+    private void loadModalityAndNumber(Elements record, Bidding bidding){
+        List<String> values =  Arrays.stream(record.select("> b").get(1).text().split("Nº")).toList();
+        bidding.setModality(values.get(0).trim());
+        bidding.setModality(values.get(1).trim());
+    }
 
-
-            Map<String, String> data = new HashMap<>();
-            String empresaText = td.select("b").first().text();
-            if (empresaText.contains("Código da UASG:")) {
-                data.put("Empresa", empresaText.split("Código da UASG:")[0].trim());
-                data.put("Código da UASG", empresaText.split("Código da UASG:")[1].trim());
-            }
-
-            String pregaoText = td.select("b").get(1).text();
-            if (pregaoText.contains("Pregão Eletrônico Nº")) {
-                data.put("Pregão Eletrônico Nº", pregaoText.split("Pregão Eletrônico Nº   ")[1].trim());
-            }
-            System.out.println(data);
-        }
-        System.out.println("Title: " + title);
-
+    private Integer loadTotalRecord(String recodTotalText){
+        // Usando expressão regular para encontrar o último número
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(recodTotalText);
+        return Integer.getInteger(matcher.group());
     }
 }
 

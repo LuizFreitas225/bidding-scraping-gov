@@ -12,7 +12,7 @@ class ScrapingServiceTest {
     @Autowired
     private ScrapingService scrapingService;
     @Test
-    void runScraping() throws IOException {
+    void runScraping() throws Exception {
         scrapingService.runScraping();
     }
 }
