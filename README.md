@@ -61,7 +61,7 @@ Certifique-se de ter o Java 17 instalado em sua máquina. O projeto utiliza o fr
 
 A documentação Swagger está disponível e pode ser acessada em [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html#/bidding-controller/searchBiddings)
 
-![Untitled](README%20-%20Bidding%20Scraping%20Gov%20-%20API%200ef771fe70114befbc47770d15727430/Untitled.png)
+![Swagger](image/swagger.png)
 
 ## Contribuições
 
