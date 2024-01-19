@@ -50,7 +50,7 @@ public class ScrapingService {
 
                 log.info("Salvando dados da página " + index);
                 service.saveOrUpdate(biddingList);
-                doc = Jsoup.connect(URL + "?pagina=" + index + 1).get();
+                doc = Jsoup.connect(URL + "?pagina=" + (index + 1)).get();
             }
         } catch (Exception e) {
             log.info("Mandar email ao suporte: Alguma mudança pode ter impedido a leitura diária de dados. Por favor, verificar o mais rápido possível.");
