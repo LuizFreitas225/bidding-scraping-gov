@@ -8,7 +8,6 @@ import java.util.Objects;
 @Data
 public class BiddingKey implements Serializable {
 
-    //private Long id;
     private String UASGCode;
     private String modality;
     private String number;
@@ -18,8 +17,7 @@ public class BiddingKey implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BiddingKey that = (BiddingKey) o;
-        return //Objects.equals(id, that.id) &&
-                (Objects.equals(UASGCode, that.UASGCode) &&
+        return  (Objects.equals(UASGCode, that.UASGCode) &&
                 Objects.equals(modality, that.modality) &&
                 Objects.equals(number, that.number));
     }
