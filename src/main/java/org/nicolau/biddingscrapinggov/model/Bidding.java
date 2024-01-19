@@ -31,5 +31,5 @@ public class Bidding {
     private LocalDate deliveryDateProposal;
     private String deliveryDateProposalDetails;
     @Column(updatable = false)
-    private boolean viewed;
+    private Boolean viewed = false;
 }

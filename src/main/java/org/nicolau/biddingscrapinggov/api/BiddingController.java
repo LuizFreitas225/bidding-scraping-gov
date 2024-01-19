@@ -6,10 +6,7 @@ import org.nicolau.biddingscrapinggov.service.BiddingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/bidding")
@@ -18,18 +15,29 @@ public class BiddingController {
 
     private final BiddingService biddingService;
 
-    @GetMapping
-    public ResponseEntity<Page<Bidding>> searchBiddings(Pageable pageable) {
-        Page<Bidding> biddings = biddingService.searchBiddings(pageable);
+    @GetMapping("search")
+    public ResponseEntity<Page<Bidding>> searchBiddings(
+            @RequestParam( defaultValue = "") String searchTerm,
+            @RequestParam( required = false) Boolean viewed,
+            Pageable pageable) {
+        Page<Bidding> biddings = biddingService.searchBiddings( searchTerm, viewed,  pageable);
         return ResponseEntity.ok(biddings);
     }
 
-    @GetMapping("/{uasgCode}/{modality}/{number}")
+    @GetMapping("by-id")
     public ResponseEntity<Bidding> getBiddingById(
-            @PathVariable String uasgCode,
-            @PathVariable String modality,
-            @PathVariable String number) {
+            @RequestParam( required = true) String uasgCode,
+            @RequestParam( required = true) String modality,
+            @RequestParam( required = true) String number) {
         Bidding bidding = biddingService.getBiddingById(uasgCode, modality, number);
         return ResponseEntity.ok(bidding);
+    }
+
+    @PatchMapping("viewed")
+    public void updateViewed(
+            @RequestParam( required = true) String uasgCode,
+            @RequestParam( required = true) String modality,
+            @RequestParam( required = true) String number) {
+        biddingService.viewedCheck(uasgCode, modality, number);
     }
 }

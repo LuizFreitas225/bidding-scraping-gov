@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ScrapingService {
 
-    private static final int NUMBER_OF_RECORDS_PAGE = 165;
+    private static final int NUMBER_OF_RECORDS_PAGE = 20;
     private static final String URL = "http://comprasnet.gov.br/ConsultaLicitacoes/ConsLicitacaoDia.asp";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
